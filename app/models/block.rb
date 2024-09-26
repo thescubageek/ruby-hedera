@@ -1,22 +1,19 @@
 # frozen_string_literal: true
 
-class Block
-  include ActiveModel::Model
-  include HTTParty
-
-  attr_accessor :id, :network
+class Block < HederaBase
+  attr_accessor :id, :data
 
   def initialize(id: nil, network: 'main')
-    raise 'Invalid network' unless network.in?(Api::V1::ApplicationController::BASE_URIS)
-    
-    @network = network
     @id = id
-    self.class.base_uri BASE_URIS[network]
+    @data = nil
+    super(network: network)
   end
 
   # Class method to fetch all blocks
   def self.all(query_params: {}, network: 'main')
-    response = get('/blocks', query: query_params)
+    validate_network!(network)
+
+    response = get("#{BASE_URIS[network]}/blocks", query: query_params)
     handle_response(response)
   end
 
@@ -25,17 +22,11 @@ class Block
     raise 'Block ID is required' unless id
 
     response = self.class.get("/blocks/#{id}")
-    handle_response(response)
+    self.class.handle_response(response)
   end
 
-  private
-
-  # Helper method to handle the response
-  def self.handle_response(response)
-    if response.success?
-      JSON.parse(response.body)
-    else
-      { error: response.message }
-    end
+  # Memoize data so it can be referenced on the model without fetching again
+  def data
+    @data ||= fetch
   end
 end
