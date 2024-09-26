@@ -6,9 +6,7 @@ module Api
 
         # GET /api/v1/tokens/:token_id/nfts
         def index
-          unless valid_query_params?(params, %w[limit order serial_number])
-            return render json: { error: 'Invalid query parameters' }, status: :bad_request
-          end
+          return unless valid_query_params?(params, %w[limit order serial_number])
 
           token_id = params.require(:token_id)
           response = self.class.get("/api/v1/tokens/#{token_id}/nfts", query: filtered_params(params))

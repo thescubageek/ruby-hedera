@@ -6,9 +6,7 @@ module Api
 
         # GET /api/v1/topics/:topic_id/messages
         def index
-          unless valid_query_params?(params, %w[limit order sequence_number timestamp])
-            return render json: { error: 'Invalid query parameters' }, status: :bad_request
-          end
+          return unless valid_query_params?(params, %w[limit order sequence_number timestamp])
 
           response = self.class.get("/api/v1/topics/#{params[:topic_id]}/messages", query: filtered_params(params))
 

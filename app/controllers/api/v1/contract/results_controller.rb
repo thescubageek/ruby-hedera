@@ -6,9 +6,7 @@ module Api
 
         # GET /api/v1/contracts/results
         def index
-          unless valid_query_params?(params, %w[contract_id timestamp limit order])
-            return render json: { error: 'Invalid query parameters' }, status: :bad_request
-          end
+          return unless valid_query_params?(params, %w[contract_id timestamp limit order])
 
           response = self.class.get('/api/v1/contracts/results', query: filtered_params(params))
 
@@ -45,9 +43,7 @@ module Api
 
         # GET /api/v1/contracts/results/logs
         def logs
-          unless valid_query_params?(params, %w[contract_id timestamp limit order])
-            return render json: { error: 'Invalid query parameters' }, status: :bad_request
-          end
+          return unless valid_query_params?(params, %w[contract_id timestamp limit order])
 
           response = self.class.get('/api/v1/contracts/results/logs', query: filtered_params(params))
 

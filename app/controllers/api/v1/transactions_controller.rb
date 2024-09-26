@@ -4,9 +4,7 @@ module Api
     class TransactionsController < Api::V1::ApplicationController
       # GET /api/v1/transactions
       def index
-        unless valid_query_params?(params, %w[transaction_id account_id result type timestamp limit order])
-          return render json: { error: 'Invalid query parameters' }, status: :bad_request
-        end
+        return unless valid_query_params?(params, %w[transaction_id account_id result type timestamp limit order])
 
         response = self.class.get('/api/v1/transactions', query: filtered_params(params))
 
