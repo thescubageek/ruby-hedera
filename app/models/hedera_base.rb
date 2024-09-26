@@ -9,6 +9,7 @@ class HederaBase
   attr_accessor :network
 
   def initialize(network: 'main')
+    @data = nil
     @network = network
     validate_network!
     
@@ -21,6 +22,11 @@ class HederaBase
 
   def validate_network!
     self.class.validate_network!(network)
+  end
+
+  # Memoize data so it can be referenced on the model without fetching again
+  def data
+    @data ||= fetch if respond_to?(:fetch)
   end
 
   private

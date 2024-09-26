@@ -30,8 +30,4 @@ class Topic::Message < HederaBase
     self.class.handle_response(response)
   end
 
-  # Memoize data so it can be referenced on the model without fetching again
-  def data
-    @data ||= fetch
-  end
 end

@@ -24,8 +24,4 @@ class Balance < HederaBase
     self.class.all(query_params: { account_id: account_id, timestamp: timestamp, limit: limit, order: order }, network: network)
   end
 
-  # Memoize data so it can be referenced on the model without fetching again
-  def data
-    @data ||= fetch
-  end
 end
