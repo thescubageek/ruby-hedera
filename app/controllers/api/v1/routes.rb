@@ -2,7 +2,7 @@
 namespace :api do
   namespace :v1 do
 
-    scope ':network', constraints: { network: /main|test|preview/ } do
+    scope ':network', constraints: { network: /${Api::V1::ApplicationController::BASE_URIS}/ } do
 
       # Accounts routes
       resources :accounts, only: [:index, :show] do

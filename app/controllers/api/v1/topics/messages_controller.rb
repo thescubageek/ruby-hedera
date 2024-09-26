@@ -3,8 +3,6 @@ module Api
   module V1
     module Topics
       class MessagesController < Api::V1::ApplicationController
-        include HTTParty
-        base_uri 'https://mainnet-public.mirrornode.hedera.com'
 
         # GET /api/v1/topics/:topic_id/messages
         def index
@@ -26,23 +24,9 @@ module Api
 
         private
 
-        # Validate query parameters for the messages endpoints
-        def valid_query_params?(params, allowed_params)
-          params.keys.all? { |key| allowed_params.include?(key) }
-        end
-
         # Filter valid query params to send to Hedera API
         def filtered_params(params)
           params.permit(:limit, :order, :sequence_number, :timestamp)
-        end
-
-        # Handle response from the Hedera API and return appropriate status
-        def handle_response(response, success_status = :ok)
-          if response.code == 200 || response.code == success_status
-            render json: response.parsed_response, status: success_status
-          else
-            render json: { error: "Hedera API Error: #{response['message']}" }, status: response.code
-          end
         end
       end
     end

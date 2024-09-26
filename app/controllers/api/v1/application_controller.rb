@@ -6,6 +6,8 @@ class Api::V1::ApplicationController < ActionController::API
   TESTNET_BASE_URI = 'https://testnet.mirrornode.hedera.com/api/v1'
   PREVIEWNET_BASE_URI = 'https://previewnet.mirrornode.hedera.com/api/v1'
 
+  BASE_URIS = %w[main test preview].freeze
+
   before_action :set_base_uri
 
   private
