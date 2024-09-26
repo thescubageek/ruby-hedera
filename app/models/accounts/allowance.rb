@@ -14,7 +14,7 @@ class Accounts::Allowance < HederaBase
 
   # Class method to fetch all allowances for an account
   def self.all(account_id:, network: 'main')
-    validate_network!(network]
+    validate_network!(network])
 
     response = get("#{BASE_URIS[network]}/accounts/#{account_id}/allowances")
     handle_response(response)
