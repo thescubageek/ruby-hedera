@@ -8,7 +8,6 @@ end
 
 gem 'bundler'
 gem 'activemodel', '~> 5.1.7'
-gem 'activerecord', '~> 5.1.7'
 gem 'activesupport', '~> 5.1.7'
 
 # Use Puma as the app server
