@@ -15,28 +15,28 @@ module Api
 
         # GET /api/v1/contracts/results/:id
         def show
-          response = self.class.get("/api/v1/contracts/results/#{params[:id]}")
+          response = self.class.get("/api/v1/contracts/results/#{params.require(:id)}")
 
           handle_response(response)
         end
 
         # GET /api/v1/contracts/results/:transactionIdOrHash/actions
         def actions
-          response = self.class.get("/api/v1/contracts/results/#{params[:transactionIdOrHash]}/actions")
+          response = self.class.get("/api/v1/contracts/results/#{params.require(:transactionIdOrHash)}/actions")
 
           handle_response(response)
         end
 
         # GET /api/v1/contracts/results/:transactionIdOrHash/opcodes
         def opcodes
-          response = self.class.get("/api/v1/contracts/results/#{params[:transactionIdOrHash]}/opcodes")
+          response = self.class.get("/api/v1/contracts/results/#{params.require(:transactionIdOrHash)}/opcodes")
 
           handle_response(response)
         end
 
         # GET /api/v1/contracts/{contractIdOrAddress}/results/logs
         def logs_by_contract
-          response = self.class.get("/api/v1/contracts/#{params[:contractIdOrAddress]}/results/logs")
+          response = self.class.get("/api/v1/contracts/#{params.require(:contractIdOrAddress)}/results/logs")
 
           handle_response(response)
         end

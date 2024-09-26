@@ -13,14 +13,14 @@ module Api
 
       # GET /api/v1/transactions/:transaction_id
       def show
-        response = self.class.get("/api/v1/transactions/#{params[:transaction_id]}")
+        response = self.class.get("/api/v1/transactions/#{params.require(:transaction_id)}")
 
         handle_response(response)
       end
 
       # GET /api/v1/transactions/:transaction_id/records
       def records
-        response = self.class.get("/api/v1/transactions/#{params[:transaction_id]}/records")
+        response = self.class.get("/api/v1/transactions/#{params.require(:transaction_id)}/records")
 
         handle_response(response)
       end

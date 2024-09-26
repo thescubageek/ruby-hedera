@@ -13,7 +13,7 @@ module Api
 
       # GET /api/v1/blocks/:id
       def show
-        response = self.class.get("/api/v1/blocks/#{params[:id]}")
+        response = self.class.get("/api/v1/blocks/#{params.require(:id)}")
         handle_response(response)
       end
 

@@ -13,13 +13,13 @@ module Api
 
       # GET /api/v1/schedules/:schedule_id
       def show
-        response = self.class.get("/api/v1/schedules/#{params[:schedule_id]}")
+        response = self.class.get("/api/v1/schedules/#{params.require(:schedule_id)}")
         handle_response(response)
       end
 
       # GET /api/v1/schedules/:schedule_id/transactions
       def transactions
-        response = self.class.get("/api/v1/schedules/#{params[:schedule_id]}/transactions")
+        response = self.class.get("/api/v1/schedules/#{params.require(:schedule_id)}/transactions")
         handle_response(response)
       end
 
