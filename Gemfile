@@ -8,7 +8,6 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-
 gem 'bundler'
 gem 'activemodel', '7.1.3.4'
 gem 'activesupport', '7.1.3.4'
@@ -16,9 +15,10 @@ gem 'activesupport', '7.1.3.4'
 # Use Puma as the app server
 gem 'puma', '>= 6.4.2'
 
-gem 'httparty'
 gem 'dry-validation'
+gem 'httparty'
 gem 'wannabe_bool'
+gem 'webmock'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
@@ -37,6 +37,8 @@ group :development do
   gem 'guard', require: false
   gem 'guard-minitest', require: false
   gem 'guard-puma', require: false
+  gem 'rubocop', require: false
+  gem 'rubocop-rails', require: false
 end
 
 group :test do
