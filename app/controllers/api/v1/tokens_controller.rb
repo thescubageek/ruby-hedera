@@ -13,7 +13,7 @@ module Api
 
       # GET /api/v1/tokens/:token_id
       def show
-        response = self.class.get("/api/v1/tokens/#{params[:token_id]}")
+        response = self.class.get("/api/v1/tokens/#{params.require(:token_id)}")
         handle_response(response)
       end
 
@@ -21,7 +21,7 @@ module Api
       def balances
         return unless valid_query_params?(params, %w[limit order account_id balance])
 
-        response = self.class.get("/api/v1/tokens/#{params[:token_id]}/balances", query: filtered_params(params))
+        response = self.class.get("/api/v1/tokens/#{params.require(:token_id)}/balances", query: filtered_params(params))
         handle_response(response)
       end
 
@@ -29,7 +29,7 @@ module Api
       def nfts
         return unless valid_query_params?(params, %w[limit order serial_number])
 
-        response = self.class.get("/api/v1/tokens/#{params[:token_id]}/nfts", query: filtered_params(params))
+        response = self.class.get("/api/v1/tokens/#{params.require(:token_id)}/nfts", query: filtered_params(params))
         handle_response(response)
       end
 

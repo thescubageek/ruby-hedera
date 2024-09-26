@@ -1,7 +1,31 @@
 # app/controllers/application_controller.rb
 class Api::V1::ApplicationController < ActionController::API
   include HTTParty
-  base_uri 'https://mainnet-public.mirrornode.hedera.com'
+
+  MAINNET_BASE_URI = 'https://mainnet.mirrornode.hedera.com/api/v1'
+  TESTNET_BASE_URI = 'https://testnet.mirrornode.hedera.com/api/v1'
+  PREVIEWNET_BASE_URI = 'https://previewnet.mirrornode.hedera.com/api/v1'
+
+  BASE_URIS = %w[main test preview].freeze
+
+  before_action :set_base_uri
+
+  private
+
+  def set_base_uri
+    network = params[:network]
+
+    case network
+    when 'main'
+      self.class.base_uri = MAINNET_BASE_URI
+    when 'test'
+      self.class.base_uri = TESTNET_BASE_URI
+    when 'preview'
+      self.class.base_uri = PREVIEWNET_BASE_URI
+    else
+      render json: { error: 'Invalid network specified' }, status: :bad_request and return
+    end
+  end
 
   # Common method to handle responses from Hedera API and return appropriate status
   def handle_response(response, success_status = :ok)

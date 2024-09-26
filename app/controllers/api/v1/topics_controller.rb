@@ -5,7 +5,7 @@ module Api
 
       # GET /api/v1/topics/:topic_id
       def show
-        response = self.class.get("/api/v1/topics/#{params[:topic_id]}")
+        response = self.class.get("/api/v1/topics/#{params.require(:topic_id)}")
         handle_response(response)
       end
     end

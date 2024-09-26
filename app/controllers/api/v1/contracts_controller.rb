@@ -13,13 +13,13 @@ module Api
 
       # GET /api/v1/contracts/:id
       def show
-        response = self.class.get("/api/v1/contracts/#{params[:id]}")
+        response = self.class.get("/api/v1/contracts/#{params.require(:id)}")
         handle_response(response)
       end
 
       # GET /api/v1/contracts/:id/results
       def results
-        response = self.class.get("/api/v1/contracts/#{params[:id]}/results")
+        response = self.class.get("/api/v1/contracts/#{params.require(:id)}/results")
         handle_response(response)
       end
 
@@ -27,13 +27,13 @@ module Api
       def logs
         return unless valid_query_params?(params, %w[contract_id timestamp limit order])
 
-        response = self.class.get("/api/v1/contracts/#{params[:id]}/logs", query: filtered_params(params))
+        response = self.class.get("/api/v1/contracts/#{params.require(:id)}/logs", query: filtered_params(params))
         handle_response(response)
       end
 
       # GET /api/v1/contracts/:id/state
       def state
-        response = self.class.get("/api/v1/contracts/#{params[:id]}/state")
+        response = self.class.get("/api/v1/contracts/#{params.require(:id)}/state")
         handle_response(response)
       end
 
