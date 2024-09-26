@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Token::Nft < HederaBase
-  attr_accessor :token_id, :serial_number, :limit, :order, :data
+  attr_accessor :token_id, :serial_number, :limit, :order
 
   def initialize(token_id: nil, serial_number: nil, limit: nil, order: nil, network: 'main')
     @token_id = token_id

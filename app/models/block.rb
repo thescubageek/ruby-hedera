@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Block < HederaBase
-  attr_accessor :id, :data
+  attr_accessor :id
 
   def initialize(id: nil, network: 'main')
     @id = id

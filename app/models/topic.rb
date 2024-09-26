@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Topic < HederaBase
-  attr_accessor :topic_id, :data
+  attr_accessor :topic_id
 
   def initialize(topic_id: nil, network: 'main')
     @topic_id = topic_id

@@ -32,7 +32,17 @@ class HederaBase
     @data ||= fetch if respond_to?(:fetch)
   end
 
-  private
+  # Fall back to data if method is not defined
+  def method_missing(m, *args, &block)
+    data&.key?(m.to_s) ? data[m.to_s] : super
+  rescue StandardError => _e
+    super
+  end
+
+  # Fallback to data if method is missing
+  def respond_to_missing?(method_name, include_private = false)
+    data.key?(method_name.to_s) || super
+  end
 
   # Helper method to handle the response
   def self.handle_response(response)

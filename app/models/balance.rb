@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Balance < HederaBase
-  attr_accessor :account_id, :timestamp, :limit, :order, :data
+  attr_accessor :account_id, :timestamp, :limit, :order
 
   def initialize(account_id: nil, timestamp: nil, limit: nil, order: nil, network: 'main')
     @account_id = account_id

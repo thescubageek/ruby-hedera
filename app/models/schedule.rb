@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Schedule < HederaBase
-  attr_accessor :schedule_id, :transaction_id, :executed, :limit, :order, :data
+  attr_accessor :schedule_id, :transaction_id, :executed, :limit, :order
 
   def initialize(schedule_id: nil, transaction_id: nil, executed: nil, limit: nil, order: nil, network: 'main')
     @schedule_id = schedule_id

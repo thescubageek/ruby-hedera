@@ -1,19 +1,12 @@
 # frozen_string_literal: true
 
 class Account < HederaBase
-  attr_accessor :account_id, :public_key, :balance, :serial_number, :token_id, :start_time, :end_time, :data
+  attr_accessor :account_id
 
-  def initialize(account_id: nil, public_key: nil, balance: nil, serial_number: nil, token_id: nil, start_time: nil, end_time: nil, network: 'main')
+  def initialize(account_id: nil, network: 'main')
     @account_id = account_id
     raise 'Account ID is required' unless account_id
 
-    @public_key = public_key
-    @balance = balance
-    @serial_number = serial_number
-    @token_id = token_id
-    @start_time = start_time
-    @end_time = end_time
-    @data = nil
     super(network: network)
   end
 
@@ -22,7 +15,7 @@ class Account < HederaBase
     validate_network!(network)
 
     response = get("#{BASE_URIS[network]}/accounts", query: query_params)
-    handle_response(response)
+    handle_response(response)&.[]('accounts')
   end
 
   # Instance method to fetch a specific account by ID
