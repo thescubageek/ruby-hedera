@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'active_model'
+require 'httparty'
+
 class HederaBase
   include ActiveModel::Model
   include HTTParty
@@ -12,7 +15,7 @@ class HederaBase
     @data = nil
     @network = network
     validate_network!
-    
+
     self.class.base_uri BASE_URIS[network]
   end
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Contact < HederaBase
+class Contract < HederaBase
   attr_accessor :contract_id, :timestamp, :limit, :order, :data
 
   def initialize(contract_id: nil, timestamp: nil, limit: nil, order: nil, network: 'main')

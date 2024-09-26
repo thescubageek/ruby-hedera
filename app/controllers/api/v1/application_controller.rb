@@ -11,7 +11,11 @@ module Api
       TESTNET_BASE_URI = 'https://testnet.mirrornode.hedera.com/api/v1'
       PREVIEWNET_BASE_URI = 'https://previewnet.mirrornode.hedera.com/api/v1'
 
-      BASE_URIS = %w[main test preview].freeze
+      BASE_URIS = {
+        'main'    => MAINNET_BASE_URI,
+        'test'    => TESTNET_BASE_URI,
+        'preview' => PREVIEWNET_BASE_URI
+      }.freeze
 
       before_action :set_base_uri
 

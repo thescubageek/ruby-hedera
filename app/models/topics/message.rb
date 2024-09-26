@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Topic::Message < HederaBase
+class Topics::Message < HederaBase
   attr_accessor :topic_id, :limit, :order, :sequence_number, :timestamp, :data
 
   def initialize(topic_id: nil, limit: nil, order: nil, sequence_number: nil, timestamp: nil, network: 'main')

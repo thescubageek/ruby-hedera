@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Account::Allowance < HederaBase
+class Accounts::Allowance < HederaBase
   attr_accessor :account_id, :allowance_id, :data
 
   def initialize(account_id: nil, allowance_id: nil, network: 'main')
