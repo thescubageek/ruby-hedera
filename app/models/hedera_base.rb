@@ -39,7 +39,7 @@ class HederaBase
     super
   end
 
-  # Fallback to data if method is missing
+  # Fallback to data if method is missings
   def respond_to_missing?(method_name, include_private = false)
     data.key?(method_name.to_s) || super
   end

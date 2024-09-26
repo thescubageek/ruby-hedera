@@ -12,7 +12,7 @@ class Api::V1::BalancesControllerTest < ActionController::TestCase
   end
 
   # Test for GET /api/v1/:network/balances for each environment
-  Api::V1::ApplicationController::BASE_URIS.each do |network|
+  Api::V1::ApplicationController::BASE_URIS.each_key do |network|
     test "should get balances index for #{network}" do
       # Simulate a response from HTTParty
       HTTParty.stub :get, success_response([{ account_id: @account_id, balance: 1000, timestamp: @timestamp }].to_json) do

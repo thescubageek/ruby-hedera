@@ -14,7 +14,7 @@ class Api::V1::NetworksControllerTest < ActionController::TestCase
   end
 
   # Test for GET /api/v1/:network/network/nodes for each environment
-  Api::V1::ApplicationController::BASE_URIS.each do |network|
+  Api::V1::ApplicationController::BASE_URIS.each_key do |network|
     test "should get network nodes for #{network}" do
       # Simulate a response from HTTParty
       HTTParty.stub :get, success_response([{ node_id: @node_id }].to_json) do

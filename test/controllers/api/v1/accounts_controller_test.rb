@@ -14,7 +14,7 @@ class Api::V1::AccountsControllerTest < ActionController::TestCase
   end
 
   # Test for GET /api/v1/:network/accounts for each environment
-  Api::V1::ApplicationController::BASE_URIS.each do |network|
+  Api::V1::ApplicationController::BASE_URIS.each_key do |network|
     test "should get index for #{network}" do
       # Simulate a response from HTTParty
       HTTParty.stub :get, success_response([{ account_id: @account_id, public_key: @public_key, balance: 1000 }].to_json) do

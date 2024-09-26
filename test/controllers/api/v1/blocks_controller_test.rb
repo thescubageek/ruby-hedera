@@ -9,7 +9,7 @@ class Api::V1::BlocksControllerTest < ActionController::TestCase
   end
 
   # Test for GET /api/v1/:network/blocks for each environment
-  Api::V1::ApplicationController::BASE_URIS.each do |network|
+  Api::V1::ApplicationController::BASE_URIS.each_key do |network|
     test "should get index for #{network}" do
       # Simulate a response from HTTParty
       HTTParty.stub :get, success_response([{ block_id: @block_id, timestamp: '2021-01-01T00:00:00Z' }].to_json) do

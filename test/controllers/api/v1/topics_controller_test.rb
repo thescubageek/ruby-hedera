@@ -9,7 +9,7 @@ class Api::V1::TopicsControllerTest < ActionController::TestCase
   end
 
   # Test for GET /api/v1/:network/topics/:topic_id for each environment
-  Api::V1::ApplicationController::BASE_URIS.each do |network|
+  Api::V1::ApplicationController::BASE_URIS.each_key do |network|
     test "should get topics show for #{network}" do
       # Simulate a response from HTTParty
       HTTParty.stub :get, success_response({ topic_id: @topic_id, messages: ['message1', 'message2'] }.to_json) do
