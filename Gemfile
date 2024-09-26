@@ -24,9 +24,6 @@ gem 'wannabe_bool'
 # gem 'capistrano-rails', group: :development
 
 group :development, :test do
-  gem 'dotenv-rails'
-
-  gem 'dotenv-rails'
   gem 'pry', '~> 0.14.2'
   gem 'pry-byebug', '~> 3.10.1'
   gem 'pry-rescue', '~> 1.5.1', require: false
