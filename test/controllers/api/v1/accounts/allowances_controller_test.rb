@@ -13,7 +13,7 @@ module Api
         end
 
         # Test for GET /api/v1/:network/accounts/:account_id/allowances for each environment
-        Api::V1::ApplicationController::BASE_URIS.keys.each do |network|
+        HederaBase::BASE_URIS.keys.each do |network|
           test "should get allowances index for #{network}" do
             # Simulate a response from HTTParty
             HTTParty.stub :get, success_response([{ account_id: @account_id, allowance_id: @allowance_id }].to_json) do

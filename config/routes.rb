@@ -2,11 +2,10 @@ Rails.application.routes.draw do
   # config/routes.rb
   namespace :api do
     namespace :v1 do
-
-      scope ':network', constraints: { network: /${Api::V1::ApplicationController::BASE_URIS}/ } do
+      scope ':network', constraints: { network: Regexp.new(HederaBase::BASE_URIS.keys.join('|')) } do
 
         # Accounts routes
-        resources :accounts, only: [:index, :show] do
+        resources :accounts, only: %i[index show] do
           member do
             get :nfts
             get :rewards
@@ -26,10 +25,10 @@ Rails.application.routes.draw do
         resources :balances, only: [:index]
 
         # Blocks routes
-        resources :blocks, only: [:index, :show]
+        resources :blocks, only: %i[index show]
 
         # Contracts routes
-        resources :contracts, only: [:index, :show] do
+        resources :contracts, only: %i[index show] do
           collection do
             post :call
           end
@@ -40,7 +39,7 @@ Rails.application.routes.draw do
             get :state
           end
 
-          resources :results, only: [:index, :show] do
+          resources :results, only: %i[index show] do
             member do
               get :actions
               get :opcodes
@@ -64,22 +63,22 @@ Rails.application.routes.draw do
         end
 
         # Schedules routes
-        resources :schedules, only: [:index, :show]
+        resources :schedules, only: %i[index show]
 
         # Topics routes
         resources :topics, only: [:show] do
-          resources :messages, only: [:index, :show], param: :sequence_number
+          resources :messages, only: %i[index show], param: :sequence_number
         end
-          
+
         # Tokens routes
-        resources :tokens, only: [:index, :show] do
+        resources :tokens, only: %i[index show] do
           member do
             get :balances
             get :nfts
           end
 
           # Tokens NFTs routes
-          resources :nfts, only: [:index, :show], param: :serial_number do
+          resources :nfts, only: %i[index show], param: :serial_number do
             member do
               get :transactions
             end
@@ -87,7 +86,7 @@ Rails.application.routes.draw do
         end
 
         # Transactions routes
-        resources :transactions, only: [:index, :show]
+        resources :transactions, only: %i[index show]
       end
     end
   end

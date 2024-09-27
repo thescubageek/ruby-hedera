@@ -7,7 +7,15 @@ class HederaBase
   include ActiveModel::Model
   include HTTParty
 
-  BASE_URIS = Api::V1::ApplicationController::BASE_URIS.freeze
+  MAINNET_BASE_URI = 'https://mainnet.mirrornode.hedera.com/api/v1'
+  TESTNET_BASE_URI = 'https://testnet.mirrornode.hedera.com/api/v1'
+  PREVIEWNET_BASE_URI = 'https://previewnet.mirrornode.hedera.com/api/v1'
+
+  BASE_URIS = {
+    'main'    => MAINNET_BASE_URI,
+    'test'    => TESTNET_BASE_URI,
+    'preview' => PREVIEWNET_BASE_URI
+  }.freeze
 
   attr_accessor :network
 
@@ -47,9 +55,9 @@ class HederaBase
   # Helper method to handle the response
   def self.handle_response(response)
     if response.success?
-      JSON.parse(response.body)
+      Result.new_success(data: response.parsed_response, status: response.code)
     else
-      { error: response.message }
+      Result.new_failure(errors: [response.message], status: response.code)
     end
   end
 end

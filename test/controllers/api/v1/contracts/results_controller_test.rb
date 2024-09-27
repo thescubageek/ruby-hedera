@@ -14,7 +14,7 @@ class Api::V1::Contracts::ResultsControllerTest < ActionController::TestCase
   end
 
   # Test for GET /api/v1/:network/contracts/results for each environment
-  Api::V1::ApplicationController::BASE_URIS.each_key do |network|
+  HederaBase::BASE_URIS.each_key do |network|
     test "should get contracts results index for #{network}" do
       HTTParty.stub :get, success_response([{ contract_id: @contract_id, timestamp: @timestamp }].to_json) do
         get :index, params: { network: network, contract_id: @contract_id, timestamp: @timestamp, limit: @limit, order: @order }

@@ -14,7 +14,7 @@ class Api::V1::TokensControllerTest < ActionController::TestCase
   end
 
   # Test for GET /api/v1/:network/tokens for each environment
-  Api::V1::ApplicationController::BASE_URIS.each_key do |network|
+  HederaBase::BASE_URIS.each_key do |network|
     test "should get tokens index for #{network}" do
       # Simulate a response from HTTParty
       HTTParty.stub :get, success_response([{ token_id: @token_id, balance: @balance }].to_json) do

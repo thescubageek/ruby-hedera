@@ -5,44 +5,15 @@
 module Api
   module V1
     class ApplicationController < ActionController::API
-      include HTTParty
-
-      MAINNET_BASE_URI = 'https://mainnet.mirrornode.hedera.com/api/v1'
-      TESTNET_BASE_URI = 'https://testnet.mirrornode.hedera.com/api/v1'
-      PREVIEWNET_BASE_URI = 'https://previewnet.mirrornode.hedera.com/api/v1'
-
-      BASE_URIS = {
-        'main'    => MAINNET_BASE_URI,
-        'test'    => TESTNET_BASE_URI,
-        'preview' => PREVIEWNET_BASE_URI
-      }.freeze
-
-      before_action :set_base_uri
-
       private
 
-      def set_base_uri
-        network = params[:network]
-
-        case network
-        when 'main'
-          self.class.base_uri = MAINNET_BASE_URI
-        when 'test'
-          self.class.base_uri = TESTNET_BASE_URI
-        when 'preview'
-          self.class.base_uri = PREVIEWNET_BASE_URI
+      # Common method to handle results from Hedera API calls
+      def handle_result(result)
+        if result.success?
+          render json: result.data, status: result.status
         else
-          render json: { error: 'Invalid network specified' }, status: :bad_request and return
-        end
-      end
-
-      # Common method to handle responses from Hedera API and return appropriate status
-      def handle_response(response, success_status = :ok)
-        if response.code == 200 || response.code == success_status
-          render json: response.parsed_response, status: success_status
-        else
-          error_message = response.parsed_response['message'] || 'Unknown Error'
-          render json: { error: "Hedera API Error: #{error_message}", code: response.code }, status: response.code
+          error_message = result.errors.first&.[]('message') || 'Unknown Error'
+          render json: { error: "Hedera API Error: #{error_message}", code: result.code }, status: result.code
         end
       end
 

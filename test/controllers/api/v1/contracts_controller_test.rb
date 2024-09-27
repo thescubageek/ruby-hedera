@@ -12,7 +12,7 @@ class Api::V1::ContactsControllerTest < ActionController::TestCase
   end
 
   # Test for GET /api/v1/:network/contracts for each environment
-  Api::V1::ApplicationController::BASE_URIS.each_key do |network|
+  HederaBase::BASE_URIS.each_key do |network|
     test "should get contracts index for #{network}" do
       # Simulate a response from HTTParty
       HTTParty.stub :get, success_response([{ contract_id: @contract_id, timestamp: @timestamp }].to_json) do

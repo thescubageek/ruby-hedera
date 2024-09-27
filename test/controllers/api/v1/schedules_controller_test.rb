@@ -13,7 +13,7 @@ class Api::V1::SchedulesControllerTest < ActionController::TestCase
   end
 
   # Test for GET /api/v1/:network/schedules for each environment
-  Api::V1::ApplicationController::BASE_URIS.each_key do |network|
+  HederaBase::BASE_URIS.each_key do |network|
     test "should get schedules index for #{network}" do
       # Simulate a response from HTTParty
       HTTParty.stub :get, success_response([{ schedule_id: @schedule_id, executed: @executed }].to_json) do

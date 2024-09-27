@@ -26,7 +26,8 @@ class Account < HederaBase
 
   # Fetch NFTs for the account
   def nfts
-    query_params = { account_id: account_id, serial_number: serial_number, token_id: token_id }.compact
+    query_params = { serial_number: serial_number, token_id: token_id }.compact
+    
     response = self.class.get("/accounts/#{account_id}/nfts", query: query_params)
     self.class.handle_response(response)
   end

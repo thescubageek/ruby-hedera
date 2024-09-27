@@ -15,7 +15,7 @@ class Api::V1::TransactionsControllerTest < ActionController::TestCase
   end
 
   # Test for GET /api/v1/:network/transactions for each environment
-  Api::V1::ApplicationController::BASE_URIS.each_key do |network|
+  HederaBase::BASE_URIS.each_key do |network|
     test "should get transactions index for #{network}" do
       # Simulate a response from HTTParty
       HTTParty.stub :get, success_response([{ transaction_id: @transaction_id, account_id: @account_id, result: @result }].to_json) do

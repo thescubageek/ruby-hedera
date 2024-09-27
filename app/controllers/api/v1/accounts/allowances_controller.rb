@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require 'test_helper'
+
 # app/controllers/api/v1/accounts/allowances_controller.rb
 module Api
   module V1
