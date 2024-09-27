@@ -13,6 +13,7 @@ class OpenApiFilter
   end
 
   # Filter method that returns the filtered OpenAPI based on a regex pattern
+  # rubocop:disable Metrics/MethodLength
   def filter(regex_pattern)
     # Select paths matching the regular expression
     filtered_paths = @openapi_data['paths'].select do |path, _details|
@@ -32,17 +33,16 @@ class OpenApiFilter
         if operation['requestBody'] && operation['requestBody']['content']
           used_components.concat(collect_components_from_content(operation['requestBody']['content']))
         end
-        if operation['responses']
+
+        if operation['responses'].present?
           operation['responses'].each_value do |response|
             used_components.concat(collect_components_from_content(response['content'])) if response['content']
           end
         end
-        if operation['parameters']
-          operation['parameters'].each do |parameter|
-            if parameter['schema'] && parameter['schema']['$ref']
-              used_components << extract_component_name(parameter['schema']['$ref'])
-            end
-          end
+
+        Array.wrap(operation['parameters']).each do |parameter|
+          ref = parameter.dig('schema', '$ref') || parameter['$ref']
+          used_components << extract_component_name(ref) if ref.present?
         end
       end
     end
@@ -56,16 +56,17 @@ class OpenApiFilter
 
     # Construct the new filtered OpenAPI object
     {
-      'openapi' => @openapi_data['openapi'],
-      'info' => @openapi_data['info'],
-      'paths' => filtered_paths,
-      'tags' => @openapi_data['tags'].select { |tag| used_tags.include?(tag['name']) },
+      'openapi'    => @openapi_data['openapi'],
+      'info'       => @openapi_data['info'],
+      'paths'      => filtered_paths,
+      'tags'       => @openapi_data['tags'].select { |tag| used_tags.include?(tag['name']) },
       'components' => filtered_components
     }
   end
+  # rubocop:enable Metrics/MethodLength
 
   # Export the filtered JSON/YAML to a new file
-  def export(new_file_path, regex_pattern)
+  def export(regex_pattern, new_file_path)
     filtered_data = filter(regex_pattern)
 
     # Write to the new file in the appropriate format (JSON or YAML)
@@ -81,7 +82,7 @@ class OpenApiFilter
     when '.json'
       JSON.parse(File.read(file_path))
     when '.yml', '.yaml'
-      YAML.safe_load(File.read(file_path))
+      YAML.safe_load_file(file_path)
     else
       raise "Unsupported file format: #{ext}. Please provide a .json, .yml, or .yaml file."
     end

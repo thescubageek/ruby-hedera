@@ -27,6 +27,7 @@ class Result
 
   alias_method :success?, :success
 
+  # @return [Boolean] true if result failed
   def failure?
     !success
   end
