@@ -1,133 +1,129 @@
 # frozen_string_literal: true
 
-require 'json'
 require 'yaml'
+require 'json'
+require 'set'
 
-class OpenApiFilter
-  attr_reader :file_path, :openapi_data
+class OpenApiSlicer
+  attr_accessor :spec
 
-  # Initialize with the OpenAPI file path, supports both JSON and YML files
-  def initialize(file_path)
+  def initialize(file_path:)
+    raise 'Invalid file type. Only JSON and YAML are supported.' unless file_path.match?(/\.(json|ya?ml)$/)
+
     @file_path = file_path
-    @openapi_data = load_file(file_path)
+    @spec = load_spec(file_path)
+    @components = {}
+    @tags = Set.new
   end
 
-  # Filter method that returns the filtered OpenAPI based on a regex pattern
-  def filter(regex_pattern)
-    # Select paths matching the regular expression
-    filtered_paths = @openapi_data['paths'].select do |path, _details|
-      path.match(regex_pattern)
-    end
+  def filter(regex)
+    paths = @spec['paths'].select { |path, _| path.match?(regex) }
+    dependencies = extract_dependencies(paths)
+    slice_spec(paths, dependencies)
+  end
 
-    # Collect associated tags and components used in the filtered paths
-    used_tags = []
-    used_components = []
-
-    filtered_paths.each_value do |methods|
-      methods.each_value do |operation|
-        # Collect tags
-        used_tags.concat(operation['tags']) if operation['tags']
-
-        # Collect components from requestBody, responses, and parameters
-        if operation['requestBody'] && operation['requestBody']['content']
-          used_components.concat(collect_components_from_content(operation['requestBody']['content']))
-        end
-        if operation['responses']
-          operation['responses'].each_value do |response|
-            used_components.concat(collect_components_from_content(response['content'])) if response['content']
-          end
-        end
-        if operation['parameters']
-          operation['parameters'].each do |parameter|
-            if parameter['schema'] && parameter['schema']['$ref']
-              used_components << extract_component_name(parameter['schema']['$ref'])
-            end
-          end
-        end
+  def export(regex, target_file)
+    result = filter(regex)
+    File.open(target_file, 'w') do |f|
+      if target_file.match?(/\.json$/)
+        f.write(result.to_json)
+      else
+        f.write(result.to_yaml)
       end
     end
-
-    # Remove duplicate tags and components
-    used_tags.uniq!
-    used_components.uniq!
-
-    # Filter components to only include those that are referenced
-    filtered_components = filter_components(used_components)
-
-    # Construct the new filtered OpenAPI object
-    {
-      'openapi' => @openapi_data['openapi'],
-      'info' => @openapi_data['info'],
-      'paths' => filtered_paths,
-      'tags' => @openapi_data['tags'].select { |tag| used_tags.include?(tag['name']) },
-      'components' => filtered_components
-    }
-  end
-
-  # Export the filtered JSON/YAML to a new file
-  def export(new_file_path, regex_pattern)
-    filtered_data = filter(regex_pattern)
-
-    # Write to the new file in the appropriate format (JSON or YAML)
-    File.write(new_file_path, generate_file_content(new_file_path, filtered_data))
   end
 
   private
 
-  # Load the file as JSON or YAML based on the file extension
-  def load_file(file_path)
-    ext = File.extname(file_path).downcase
-    case ext
-    when '.json'
+  # Load the OpenAPI spec from the file
+  def load_spec(file_path)
+    if file_path.end_with?('.json')
       JSON.parse(File.read(file_path))
-    when '.yml', '.yaml'
-      YAML.safe_load(File.read(file_path))
     else
-      raise "Unsupported file format: #{ext}. Please provide a .json, .yml, or .yaml file."
+      YAML.load_file(file_path)
     end
   end
 
-  # Generate the file content in either JSON or YAML format
-  def generate_file_content(file_path, data)
-    ext = File.extname(file_path).downcase
-    case ext
-    when '.json'
-      JSON.pretty_generate(data)
-    when '.yml', '.yaml'
-      YAML.dump(data)
-    else
-      raise "Unsupported output format: #{ext}. Please provide a .json, .yml, or .yaml file."
-    end
-  end
-
-  # Helper method to collect components from content section (e.g., requestBody, responses)
-  def collect_components_from_content(content)
-    components = []
-    content.each_value do |media_type|
-      if media_type['schema'] && media_type['schema']['$ref']
-        components << extract_component_name(media_type['schema']['$ref'])
+  # Extracts all component and tag dependencies from the filtered paths
+  def extract_dependencies(paths)
+    dependencies = Set.new
+    paths.each_value do |operations|
+      operations.each_value do |operation|
+        extract_from_operation(operation, dependencies)
       end
     end
-    components
+    dependencies
   end
 
-  # Extract component name from a $ref string, e.g., '#/components/schemas/MyComponent'
-  def extract_component_name(ref_string)
-    ref_string.split('/').last
+  # Extracts $ref dependencies from a given operation
+  def extract_from_operation(operation, dependencies)
+    operation['parameters']&.each { |param| resolve_ref(param['$ref'], dependencies) if param['$ref'] }
+    operation['responses']&.each_value do |response|
+      resolve_response_refs(response, dependencies)
+    end
+    @tags.merge(operation['tags']) if operation['tags']
   end
 
-  # Filter components to only include the ones used in the filtered paths
-  def filter_components(used_components)
-    return {} unless @openapi_data['components'] && @openapi_data['components']['schemas']
+  # Recursively resolves component references and adds to the dependency set
+  def resolve_ref(ref, dependencies)
+    return unless ref
 
-    # Filter schemas in the components section
-    filtered_schemas = @openapi_data['components']['schemas'].select do |component_name, _schema|
-      used_components.include?(component_name)
+    component = ref.split('/').last
+    return if dependencies.include?(component)
+
+    dependencies.add(component)
+    component_data = @spec.dig('components', 'schemas', component) ||
+                     @spec.dig('components', 'responses', component) ||
+                     @spec.dig('components', 'parameters', component) ||
+                     @spec.dig('components', 'requestBodies', component)
+
+    return unless component_data
+
+    if component_data['properties']
+      component_data['properties'].each_value do |property|
+        resolve_ref(property['$ref'], dependencies) if property['$ref']
+      end
     end
 
-    # You can expand this logic to other components (e.g., responses, parameters, etc.)
-    {
-      'schemas' => filtered_schemas
+    if component_data['allOf']
+      component_data['allOf'].each { |sub| resolve_ref(sub['$ref'], dependencies) if sub['$ref'] }
+    end
+  end
+
+  # Recursively resolve response references
+  def resolve_response_refs(response, dependencies)
+    resolve_ref(response['$ref'], dependencies) if response['$ref']
+    response['content']&.each_value do |media_type|
+      resolve_ref(media_type.dig('schema', '$ref'), dependencies) if media_type.dig('schema', '$ref')
+    end
+  end
+
+  # Slice the spec and keep only the filtered paths, dependencies, and tags
+  def slice_spec(paths, dependencies)
+    result = {
+      'openapi' => @spec['openapi'],
+      'info' => @spec['info'],
+      'paths' => paths,
+      'components' => slice_components(dependencies),
+      'tags' => slice_tags
     }
+    result['servers'] = @spec['servers'] if @spec['servers']
+    result
+  end
+
+  # Keep only the necessary components
+  def slice_components(dependencies)
+    sliced = {}
+    %w[schemas responses parameters requestBodies].each do |type|
+      next unless @spec['components'] && @spec['components'][type]
+
+      sliced[type] = @spec['components'][type].select { |name, _| dependencies.include?(name) }
+    end
+    sliced
+  end
+
+  # Keep only the necessary tags
+  def slice_tags
+    @spec['tags']&.select { |tag| @tags.include?(tag['name']) }
   end
 end
