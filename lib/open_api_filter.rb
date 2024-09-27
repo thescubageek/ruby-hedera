@@ -13,7 +13,6 @@ class OpenApiFilter
   end
 
   # Filter method that returns the filtered OpenAPI based on a regex pattern
-  # rubocop:disable Metrics/MethodLength
   def filter(regex_pattern)
     # Select paths matching the regular expression
     filtered_paths = @openapi_data['paths'].select do |path, _details|
@@ -24,32 +23,17 @@ class OpenApiFilter
     used_tags = []
     used_components = []
 
-    filtered_paths.each_value do |methods|
-      methods.each_value do |operation|
-        # Collect tags
+    filtered_paths.each_value do |path|
+      path.each_value do |operation|
         used_tags.concat(operation['tags']) if operation['tags']
 
-        # Collect components from requestBody, responses, and parameters
-        if operation['requestBody'] && operation['requestBody']['content']
-          used_components.concat(collect_components_from_content(operation['requestBody']['content']))
-        end
-
-        if operation['responses'].present?
-          operation['responses'].each_value do |response|
-            used_components.concat(collect_components_from_content(response['content'])) if response['content']
-          end
-        end
-
-        Array.wrap(operation['parameters']).each do |parameter|
-          ref = parameter.dig('schema', '$ref') || parameter['$ref']
-          used_components << extract_component_name(ref) if ref.present?
-        end
+        used_components.concat(collect_used_components(operation))
       end
     end
 
     # Remove duplicate tags and components
-    used_tags.uniq!
-    used_components.uniq!
+    used_tags.compact.uniq!
+    used_components.compact.uniq!
 
     # Filter components to only include those that are referenced
     filtered_components = filter_components(used_components)
@@ -63,7 +47,28 @@ class OpenApiFilter
       'components' => filtered_components
     }
   end
-  # rubocop:enable Metrics/MethodLength
+
+  # Finds all used components for a schema operation
+  def collect_used_components(operation)
+    used_components = []
+    # Collect components from requestBody, responses, and parameters
+    if operation['requestBody'] && operation['requestBody']['content']
+      used_components.concat(collect_components_from_content(operation['requestBody']['content']))
+    end
+
+    if operation['responses'].present?
+      operation['responses'].each_value do |response|
+        used_components.concat(collect_components_from_content(response['content'])) if response['content']
+      end
+    end
+
+    Array.wrap(operation['parameters']).each do |parameter|
+      ref = parameter.dig('schema', '$ref') || parameter['$ref']
+      used_components << extract_component_name(ref) if ref.present?
+    end
+
+    used_components
+  end
 
   # Export the filtered JSON/YAML to a new file
   def export(regex_pattern, new_file_path)
